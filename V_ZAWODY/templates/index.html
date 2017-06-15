@@ -1,0 +1,25 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Python Websockets Chat Demo</title>
+    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="static/css/application.css" rel="stylesheet" media="screen">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div id="buttons" class="clearfix">
+    {% for button in range(0, 100) %}
+    <a id="{{ button }}"
+    {% if button in actives %}
+    class="active"
+    {% endif %}
+    >{{ button }}</a>
+    {% endfor %}
+    </div>
+
+    <script type="text/javascript" src="static/js/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="static/js/reconnecting-websocket.min.js"></script>
+    <script type="text/javascript" src="static/js/application.js"></script>
+  </body>
+</html>

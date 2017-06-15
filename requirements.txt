@@ -1,0 +1,4 @@
+flask
+flask-sockets
+gunicorn
+redis

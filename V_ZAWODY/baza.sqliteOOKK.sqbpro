@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/mimak/PycharmProjects/Zawody/V_ZAWODY/baza.sqlite"/><window><current_tab id="1"/></window><tab_structure><column_width id="0" width="350"/><column_width id="1" width="0"/><column_width id="2" width="324"/><column_width id="3" width="8249"/><expanded_item id="0" parent="-1"/><expanded_item id="1" parent="-1"/><expanded_item id="2" parent="-1"/><expanded_item id="3" parent="-1"/></tab_structure><tab_browse><current_table name="KATEGORIE_WIEKOWE"/><default_encoding codec=""/><browsetable_info data="AAAABgAAABYAWgBFAFMAVABBAFcASQBFAE4ASQBFAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAA4AWgBBAFcATwBEAFkAMgAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8AAAAMAFoAQQBXAE8ARABZAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAABIAWgBBAFcATwBEAE4ASQBDAFkAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAIgBQAFIAWgBFAEIASQBFAEcASQBfAFoAQQBXAE8ARABPAFcAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAIgBLAEEAVABFAEcATwBSAEkARQBfAFcASQBFAEsATwBXAEUAAAAEAAAAAQAAAAAAAAAAAAAAAAD/////"/></tab_browse><tab_sql><sql name="SQL 1">DROP TRIGGER  TG_PRZEBIEGI_ZAWODOW_CZASY ;
+CREATE TRIGGER  TG_PRZEBIEGI_ZAWODOW_CZASY AFTER INSERT 
+ON PRZEBIEGI_ZAWODOW
+BEGIN
+ UPDATE PRZEBIEGI_ZAWODOW set
+  CZAS=datetime('now')
+  where ID_PRZEBIEGU=new.ID_PRZEBIEGU;
+   --#INSERT INTO AUDIT(EMP_ID, ENTRY_DATE) VALUES (new.ID, datetime('now'));
+END;</sql><sql name="SQL 3">CREATE TRIGGER TG_PRZEBIEGI_ZAWODOW_CZASY 
+AFTER INSERT ON &quot;PRZEBIEGI_ZAWODOW&quot; 
+BEGIN UPDATE PRZEBIEGI_ZAWODOW 
+set CZAS=datetime('now') - datetime((select CZAS_REJESTRACJI from PRZEBIEGI_ZAWODOW where ID_ZAWODOW=new.ID_ZAWODOW and ID_PRZEBIEGU=0 )),
+ID_PRZEBIEGU=(select max(ID_PRZEBIEGU) from PRZEBIEGI_ZAWODOW)+1
+
+where ID_PRZEBIEGU=new.ID_PRZEBIEGU; 
+
+END;</sql><sql name="SQL 6">insert into przebiegi_zawodow (
+--ID_PRZEBIEGU,
+	`ID_ZAWODOW`	,
+	`ID_ZAWODNIKA`	)
+	values (2,3);</sql><sql name="SQL 7">create view ZESTAWIENIE as
+select zwd.NAZWA_ZAWODOW, pz.ID_ZAWODNIKA, z.IMIE||' '||z.NAZWISKO as ZAWODNIK, kw.ID_KATEGORII, kw.NAZWA_KATEGORII,
+pz.NUMER_OKRAZENIA, 
+strftime('%H:%M:%f',
+3600*24*365*(strftime('%Y', pz.CZAS_REJESTRACJI) -strftime('%Y', start.CZAS_REJESTRACJI) )+
+3600*24*(strftime('%j', pz.CZAS_REJESTRACJI) -strftime('%j', start.CZAS_REJESTRACJI) )+
+3600*(strftime('%H', pz.CZAS_REJESTRACJI) -strftime('%H', start.CZAS_REJESTRACJI) )+
+60*(strftime('%M', pz.CZAS_REJESTRACJI) -strftime('%M', start.CZAS_REJESTRACJI) )+
+60*(strftime('%M', pz.CZAS_REJESTRACJI) -strftime('%M', start.CZAS_REJESTRACJI) )+
+(strftime('%f', pz.CZAS_REJESTRACJI) -strftime('%f', start.CZAS_REJESTRACJI) ),
+'unixepoch')
+as CZAS,
+CASE
+WHEN pz.NUMER_OKRAZENIA=(select ILE_OKRAZEN from ZAWODY where ID_ZAWODOW=pz.ID_ZAWODOW) THEN 'T'
+ELSE 'N'
+END CZY_META
+
+from PRZEBIEGI_ZAWODOW pz
+join ZAWODNICY z on
+z.ID_ZAWODNIKA = pz.ID_ZAWODNIKA
+join KATEGORIE_WIEKOWE kw on
+z.ROK_URODZENIA between kw.ROK_OD and kw.ROK_DO
+join ZAWODY zwd on
+zwd.ID_ZAWODOW=pz.ID_ZAWODOW
+
+ left join 
+(
+select pz_start.CZAS_REJESTRACJI , pz_start.ID_ZAWODOW 
+
+from PRZEBIEGI_ZAWODOW pz_start  where pz_start.ID_PRZEBIEGU=0
+) start on pz.ID_ZAWODOW = pz.ID_ZAWODOW
+;</sql><sql name="SQL 8">CREATE TRIGGER TG_PRZEBIEGI_ZAWODOW_CZASY 
+AFTER INSERT ON &quot;PRZEBIEGI_ZAWODOW&quot; 
+BEGIN UPDATE PRZEBIEGI_ZAWODOW 
+set 
+NUMER_OKRAZENIA=(select max(NUMER_OKRAZENIA) +1 from PRZEBIEGI_ZAWODOW where  ID_ZAWODNIKA=new.ID_ZAWODNIKA and ID_ZAWODOW=new.ID_ZAWODOW),
+ID_PRZEBIEGU=(select max(ID_PRZEBIEGU) +1 from PRZEBIEGI_ZAWODOW )
+where ROWID=new.ROWID; 
+
+END;</sql><sql name="SQL 10">select max(ID_PRZEBIEGU) +1 from PRZEBIEGI_ZAWODOW;</sql><current_tab id="2"/></tab_sql></sqlb_project>
